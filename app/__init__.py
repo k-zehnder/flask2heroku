@@ -21,36 +21,10 @@ def create_app():
         app.register_blueprint(main_bp)
 
         # import our utils.py file
-        #from .utils import validate_image, my_decode_text, encode_text
+        #from utils.utility_fxns import validate_image, my_decode_text, encode_text
 
         # Create database tables for our data models
         #db.create_all()
 
         return app
-
-
-# from flask import Flask
-# from flask_mail import Mail, Message
-# from flask_sqlalchemy import SQLAlchemy
-# import os, config
-
-# # initializes extensions
-# db = SQLAlchemy()
-
-# # application factory
-# def create_app(config):
-    
-#     # create application instance
-#     app = Flask(__name__)
-#     app.config.from_object(config)
-
-#     db.init_app(app)
-
-#     from app.main import bp as main_bp
-#     app.register_blueprint(main_bp)
-    
-#     #from .admin import main as admin_blueprint
-#     #app.register_blueprint(admin_blueprint)
-
-#     return app
 
