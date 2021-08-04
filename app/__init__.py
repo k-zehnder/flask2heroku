@@ -24,7 +24,7 @@ def create_app():
         #from .utils import validate_image, my_decode_text, encode_text
 
         # Create database tables for our data models
-        #db.create_all()
+        db.create_all()
 
         return app
 
