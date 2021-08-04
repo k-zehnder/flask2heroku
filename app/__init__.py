@@ -28,7 +28,7 @@ def create_app():
 
         return app
 
-
+from app.models import models
 
 # from flask import Flask
 # from flask_mail import Mail, Message
