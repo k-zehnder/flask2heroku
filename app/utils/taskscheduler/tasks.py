@@ -1,5 +1,7 @@
 from .tools import CeleryTask
-from flaskapp.core.ivr_core import call_to_check_bld
+#from flaskapp.core.ivr_core import call_to_check_bld
+
+from app.utils.tmp_core import call_to_check_bld
 
 #########################################
 # celelry application : dont change or delete

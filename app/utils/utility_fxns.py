@@ -104,8 +104,10 @@ def execute(max_worker = 5):
     if max_worker > 15:
         raise RuntimeError("cannot creat workers above 15")
 
-    from .settings import Spreadsheet_config as sp_config
-    from .settings import PostgresSQL_config as psql_config
+    # from .settings import Spreadsheet_config as sp_config
+    # from .settings import PostgresSQL_config as psql_config
+    from app.utils.gspread_to_postgres import Spreadsheet_config as sp_config
+    from app.utils.gspread_to_postgres import spreadsheet_config as psql_config
 
     if psql_config.__dict__.get('database'):
         database =  psql_config.database

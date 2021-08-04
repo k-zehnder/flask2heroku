@@ -33,12 +33,14 @@ def get_profile_details():
     ''' Not using any task function because calling the function 
         directly inside the beat which is scheduled weekly'''
     
-    from flaskapp.core.ivr_core import profile_detail
+    # from flaskapp.core.ivr_core import profile_detail
+    # profile_detail()
+    from app.utils.utility_fxns import profile_detail
     profile_detail()
-
+    
 @celery_app.create_beat(name='gspread_to_postgres')
 def gspread_to_postgess():
     ''' Copies google_sheets to postgres every 2 days '''
 
-    from gspread_to_postgres import execute
+    from app.utils.gspread_to_postgres.google_sheets_to_postgres import execute
     execute()
