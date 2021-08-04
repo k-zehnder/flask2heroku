@@ -1,4 +1,5 @@
 from app import db
+from peewee import *
 
 class Patient(db.Model):
     id = db.Column(db.Integer, primary_key=True)

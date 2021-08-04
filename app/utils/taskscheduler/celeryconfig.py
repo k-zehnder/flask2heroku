@@ -14,10 +14,10 @@ config = {
     # "timezone":'',
     "enable_utc":True,
     "beat_schedule":{
-    "call-DB-and-schedule-task": {
-        'task': 'schedule-tasks-from-DB',
-        'schedule': timedelta(seconds=5)
-    },
+    # "call-DB-and-schedule-task": {
+    #     'task': 'schedule-tasks-from-DB',
+    #     'schedule': timedelta(seconds=5)
+    # },
     'weekly-profile-details':{
         'task':'get-profile-details-weekly',
         'schedule':timedelta(days=7)
@@ -25,6 +25,10 @@ config = {
     'gspread_to_postgess':{
         'task':'gspread_to_postgres',
         'schedule':timedelta(days=2)
+    },
+    'test':{
+        'task':'print-hi',
+        'schedule':timedelta(seconds=20)
     }
 }
 }
