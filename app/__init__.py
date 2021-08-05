@@ -1,10 +1,12 @@
 """Initialize Flask app."""
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-import os, config
+from flask_migrate import Migrate 
 from config import DevelopementConfig
+import os, config
 
 db = SQLAlchemy()
+migrate = Migrate()
 
 # application factory
 def create_app():
@@ -14,6 +16,7 @@ def create_app():
 
     # Initialize plugins
     db.init_app(app)
+    migrate.init_app(app, db)
 
     with app.app_context():
 
