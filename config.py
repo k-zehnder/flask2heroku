@@ -1,9 +1,16 @@
 import os
 from dotenv import load_dotenv
+from os import environ
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '.env'))
 
+USER = "zelda" or os.environ.get("USER")
+PASS = "password" or os.environ.get("PASS")
+HOST = "localhost" or os.environ.get("HOST")
+PORT = 5432 or os.environ.get("PORT")
+DB = "patient" or os.environ.get("DB")
+db_string = f"postgres://{USER}:{PASS}@{HOST}:{PORT}/{DB}"
 
 class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'A SECRET KEY'
@@ -15,9 +22,7 @@ class Config(object):
 
 class DevelopementConfig(Config):
     DEBUG = os.environ.get("FLASK_ENV")
-    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI') 
-        # or 'mysql+pymysql://root:pass@localhost/flask_app_db'
-    
+    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI') # or db_string
 
 # class TestingConfig(Config):
 #     DEBUG = True
