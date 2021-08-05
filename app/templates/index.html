@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <table id="data" class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Timezone</th>
+        <th>Timestamp</th>
+        <th>UTC Start</th>
+        <th>UTC End</th>
+        <th>Phone Number</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+        <tr>
+          <td>{{ user.username }}</td>
+          <td>{{ user.timezone }}</td>
+          <td>{{ user.timestamp }}</td>
+          <td>{{ user.utc_start }}</td>
+          <td>{{ user.utc_start }}</td>
+          <td>{{ user.phone }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

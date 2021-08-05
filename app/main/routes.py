@@ -10,15 +10,12 @@ from twilio.twiml.messaging_response import MessagingResponse
 from twilio import twiml
 from flask import render_template, flash, redirect, url_for, request, g, \
     jsonify, current_app
+from playhouse.db_url import connect # needed for peewee in heroku
+from dotenv import load_dotenv
 from app import db
 from app.models import Patient
 from app.main import bp
 
-
-
-import os
-from flask import request, jsonify, url_for
-from flask import Response
 from twilio.twiml.voice_response import VoiceResponse, Dial, Gather, Say, Client
 from twilio.rest import Client as Client
 import gspread
@@ -26,16 +23,21 @@ from oauth2client.service_account import ServiceAccountCredentials
 # from flaskapp.core.ivr_core import *
 # from flaskapp.models.ivr_model import *
 
-# twilio specific
-import requests
-from flask import Flask, request, redirect, send_from_directory
-from twilio.twiml.messaging_response import MessagingResponse
-from twilio import twiml
-from dotenv import load_dotenv
+USER = "zelda"
+PASS = "password"
+HOST = "localhost"
+PORT = 5432
+DB = "patient"
+db_string = f"postgres://{USER}:{PASS}@{HOST}:{PORT}/{DB}"
+db = connect(db_string) # db = connect(os.environ.get('DATABASE_URL'))
+
+# db.create_tables([Patient])
 
 @bp.route('/')
 def hello():
-    return "Hello World!"
+    users = [user for user in Patient.select()]
+
+    return render_template('index.html', users=users, title="IVR App Demo")
 
 @bp.route("/sms", methods=['GET', 'POST'])
 def sms_reply():

@@ -51,7 +51,8 @@ for d in df_dict:
             username=d["Username"], 
             utc_start=d["UTC start"],
             utc_end=d["UTC end"],
-            phone=d["Number"]
+            phone=d["Number"],
+            timezone=d["time zone"]
             )
     p.save() # each row now stored in database
 
