@@ -28,27 +28,19 @@ load_dotenv()
 
 from playhouse.db_url import connect
 
-db_string = "postgres://knvcugzbmfbuau:19df34ac6e1ced56c8e1c48a5b44a887bf33f5266f1f4e818803eac60728a2ad@ec2-52-72-125-94.compute-1.amazonaws.com:5432/dog6la78np1vh"
-db = connect(db_string) # db = connect(os.environ.get('DATABASE_URL'))
-#db.create_tables([Patient])
-# from flask_session import Session
-from sqlalchemy import *
-from sqlalchemy.orm import scoped_session, sessionmake
 
-engine = create_engine(os.getenv("DATABASE_URL"))
-db = scoped_session(sessionmaker(bind=engine))
+db = connect(os.environ.get('DATABASE_URL'))
+db.create_tables([Patient])
+# Patient.create(username="Kiran")
 
 @bp.route('/', methods=['GET', 'POST'])
 def hello():
     if request.method == "POST":
-        data = request.form['username']
-        print(f"DATA = {data}")
-        data_to_db = Patient(
-            username=data,
+        Patient.create(
+            username=request.form['username']
         )
-        db.session.add(data_to_db)
-        db.session.commit()
-        return redirect(url_for('main.profile_detail'))
+        db.close()
+        return redirect(url_for('main.profile_detail', new_user=request.form['username']))
 
     users = [user for user in Patient.select()]
     return render_template('index.html', users=users, title="IVR App Demo")
@@ -62,10 +54,10 @@ def sms_reply():
 
     return str(resp)
 
-@bp.route("/profile_detail")
-def profile_detail():
+@bp.route("/profile_detail/<new_user>")
+def profile_detail(new_user):
     """ Function for gathering profile information from the Client"""
-    return "At profile detail"
+    return f"At profile detail for {new_user}"
     
     #TODO: query from db here in route
     #TODO: set timeszone for user to return proper time from postgres
