@@ -4,7 +4,7 @@ import numpy as np
 import datetime
 
 # initialize db
-db = PostgresqlDatabase('patient', user='zelda', password="password", host='127.0.0.1', port=5432)
+db = PostgresqlDatabase('patient', user='zelda', password="password", host='127.0.0.1', port=5432) # lowercase patient?
 
 # Base model for work with Database through ORM
 class BaseModel(Model):

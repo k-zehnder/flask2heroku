@@ -7,6 +7,7 @@ from app.auth import bp
 # from flaskapp.tools.authtools import send_otp, verify_otp
 from app.utils.authtools import send_otp, verify_otp
 
+@bp.route("/get_otp")
 def get_otp():
     '''Ph number should be a string in format +<country code><number>'''
     if request.method == 'POST':
@@ -22,7 +23,7 @@ def get_otp():
         except ConnectionError as e:
             abort(500,e)
 
-
+@bp.route("/validate_otp")
 def validate_otp():
     '''otp and phone number should be a string'''
     if request.method == "POST":
