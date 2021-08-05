@@ -26,31 +26,30 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 load_dotenv()
 
-USER = "zelda"
-PASS = "password"
-HOST = "localhost"
-PORT = 5432
-DB = "patient"
-db_string = f"postgres://{USER}:{PASS}@{HOST}:{PORT}/{DB}"
-db = connect(db_string) # db = connect(os.environ.get('DATABASE_URL'))
-
-# db.create_tables([Patient])
-#f"postgres://zelda:password@localhost:5432/patient"
 from playhouse.db_url import connect
 
-# if 'HEROKU' in os.environ:
-# import urllib.parse
-# import psycopg2
-# urllib.parse.uses_netloc.append('postgres')
-# url = urllib.parse.urlparse(os.environ.get("DATABASE_URL"))
-# conn = PostgresqlDatabase(database=url.path[1:], user=url.username, password=url.password, host=url.hostname, port=url.port)
-# db_proxy.initialize(conn)
-#db = connect(conn) # db = connect(os.environ.get('DATABASE_URL'))
+db_string = "postgres://knvcugzbmfbuau:19df34ac6e1ced56c8e1c48a5b44a887bf33f5266f1f4e818803eac60728a2ad@ec2-52-72-125-94.compute-1.amazonaws.com:5432/dog6la78np1vh"
+db = connect(db_string) # db = connect(os.environ.get('DATABASE_URL'))
 #db.create_tables([Patient])
+# from flask_session import Session
+from sqlalchemy import *
+from sqlalchemy.orm import scoped_session, sessionmake
 
+engine = create_engine(os.getenv("DATABASE_URL"))
+db = scoped_session(sessionmaker(bind=engine))
 
-@bp.route('/')
+@bp.route('/', methods=['GET', 'POST'])
 def hello():
+    if request.method == "POST":
+        data = request.form['username']
+        print(f"DATA = {data}")
+        data_to_db = Patient(
+            username=data,
+        )
+        db.session.add(data_to_db)
+        db.session.commit()
+        return redirect(url_for('main.profile_detail'))
+
     users = [user for user in Patient.select()]
     return render_template('index.html', users=users, title="IVR App Demo")
 

@@ -19,10 +19,12 @@ class Config(object):
     PRIVATE_KEY = os.environ.get("PRIVATE_KEY")
     JSON_PATH = os.environ.get("JSON_PATH")
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
-
-class DevelopementConfig(Config):
     DEBUG = os.environ.get("FLASK_ENV")
-    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI') # or db_string
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') # or db_string
+
+# class DevelopementConfig(Config):
+#     DEBUG = os.environ.get("FLASK_ENV")
+#     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI') # or db_string
 
 # class TestingConfig(Config):
 #     DEBUG = True

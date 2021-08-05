@@ -1,7 +1,7 @@
 """Initialize Flask app."""
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from config import DevelopementConfig
+from config import Config
 import os, config
 
 db = SQLAlchemy()
@@ -10,7 +10,7 @@ db = SQLAlchemy()
 def create_app():
     # create application instance
     app = Flask(__name__)
-    app.config.from_object(DevelopementConfig)
+    app.config.from_object(Config)
 
     # Initialize plugins
     db.init_app(app)
