@@ -57,7 +57,8 @@ def sms_reply():
 @bp.route("/profile_detail/<new_user>")
 def profile_detail(new_user):
     """ Function for gathering profile information from the Client"""
-    return f"At profile detail for {new_user}"
+    #return f"At profile detail for {new_user}"
+    return render_template('_new_user.html', new_user=new_user)
     
     #TODO: query from db here in route
     #TODO: set timeszone for user to return proper time from postgres
