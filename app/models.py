@@ -2,9 +2,21 @@ from peewee import *
 import pandas as pd
 import numpy as np
 import datetime
+from playhouse.db_url import connect
+import os
 
 # initialize db
-db = PostgresqlDatabase('patient', user='zelda', password="password", host='127.0.0.1', port=5432) # lowercase patient?
+# db = PostgresqlDatabase('patient', user='zelda', password="password", host='127.0.0.1', port=5432) # lowercase patient?
+USER = "zelda"
+PASS = "password"
+HOST = "localhost"
+PORT = 5432
+DB = "patient"
+db_string = f"postgres://{USER}:{PASS}@{HOST}:{PORT}/{DB}"
+
+# db = connect(os.environ.get('DATABASE_URL'))
+db = connect(db_string)
+
 
 # Base model for work with Database through ORM
 class BaseModel(Model):

@@ -26,7 +26,12 @@ from oauth2client.service_account import ServiceAccountCredentials
 # from flaskapp.core.ivr_core import *
 # from flaskapp.models.ivr_model import *
 
-
+# twilio specific
+import requests
+from flask import Flask, request, redirect, send_from_directory
+from twilio.twiml.messaging_response import MessagingResponse
+from twilio import twiml
+from dotenv import load_dotenv
 
 @bp.route('/')
 def hello():
