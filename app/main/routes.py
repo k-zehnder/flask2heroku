@@ -1,4 +1,5 @@
 import os
+from peewee import *
 from flask import request, jsonify, url_for
 from flask import Response
 from twilio.twiml.voice_response import VoiceResponse, Dial, Gather, Say, Client
@@ -23,6 +24,8 @@ from oauth2client.service_account import ServiceAccountCredentials
 # from flaskapp.core.ivr_core import *
 # from flaskapp.models.ivr_model import *
 
+load_dotenv()
+
 USER = "zelda"
 PASS = "password"
 HOST = "localhost"
@@ -32,11 +35,23 @@ db_string = f"postgres://{USER}:{PASS}@{HOST}:{PORT}/{DB}"
 db = connect(db_string) # db = connect(os.environ.get('DATABASE_URL'))
 
 # db.create_tables([Patient])
+#f"postgres://zelda:password@localhost:5432/patient"
+from playhouse.db_url import connect
+
+# if 'HEROKU' in os.environ:
+# import urllib.parse
+# import psycopg2
+# urllib.parse.uses_netloc.append('postgres')
+# url = urllib.parse.urlparse(os.environ.get("DATABASE_URL"))
+# conn = PostgresqlDatabase(database=url.path[1:], user=url.username, password=url.password, host=url.hostname, port=url.port)
+# db_proxy.initialize(conn)
+#db = connect(conn) # db = connect(os.environ.get('DATABASE_URL'))
+#db.create_tables([Patient])
+
 
 @bp.route('/')
 def hello():
     users = [user for user in Patient.select()]
-
     return render_template('index.html', users=users, title="IVR App Demo")
 
 @bp.route("/sms", methods=['GET', 'POST'])

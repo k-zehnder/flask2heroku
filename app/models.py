@@ -17,6 +17,8 @@ db_string = f"postgres://{USER}:{PASS}@{HOST}:{PORT}/{DB}"
 
 db = connect(db_string) # db = connect(os.environ.get('DATABASE_URL'))
 
+#db = connect(os.environ.get("DATABASE_URL")) # db = connect(os.environ.get('DATABASE_URL'))
+
 # Base model for work with Database through ORM
 class BaseModel(Model):
     class Meta:
