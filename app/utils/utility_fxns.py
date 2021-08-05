@@ -1,145 +1,137 @@
+import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+import datetime
+import pandas as pd
+from pytz import timezone
+import phonenumbers
+from phonenumbers import geocoder
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-import pandas as pd
-import os
-import sqlalchemy as sa
-from sqlalchemy.engine import make_url
-# from sqlalchemy.types import Integer, Text, String, DateTime
-import datetime
+from twilio.rest import Client
 
-from threading import Thread 
-from queue import Queue
+recipient_list = ['goandtodo@googlegroups.com']
 
-class Worker(Thread):
-    def __init__(self ,queue = None,*args,**kw):
-        self.callback = kw.get('target',None)
-        self.queue = queue
-        super().__init__(*args,**kw)
-    
-    def run(self):
-        while True:
-            engine,main_sheet,wrksht =  self.queue.get()
-            self.callback(engine,main_sheet,wrksht)
-            self.queue.task_done()
-
-class GoogleSheetHelper:
-    """Helper class to pull data from googlesheets"""
-    def __init__(self, cred_json, spreadsheetName):
-        self.scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-        self.cred_json = cred_json
-        self.spreadsheetName = spreadsheetName
-        self.creds = ServiceAccountCredentials.from_json_keyfile_name(self.cred_json, self.scope)
-        self.client = gspread.authorize(self.creds)
-        self.spreadsheet = self.client.open(self.spreadsheetName)
-
-    def getDataframe(self,worksheet):
-        """Returns all rows data from sheet as dataframe"""
-        sheet = self.spreadsheet.worksheet(worksheet)
-        rows = sheet.get_all_records()
-        return pd.DataFrame(rows)
-
-    def getAllWorksheet(self):
-        # spreadsheet = self.client.open(self.spreadsheetName)
-        return [s.title for s in self.spreadsheet.worksheets()] 
-
-    def getAllSpreadsheets(self):
-        """Returns sheets this gspread (self.client) authorized to view/edit"""
-        available_sheets = self.client.openall()
-        print(available_sheets)
-        return [sheet.title for sheet in available_sheets]
+sender_mail = 'heartvoices.org@gmail.com'
+account_sid = os.environ['TWILIO_ACCOUNT_SID']
+auth_token = os.environ['TWILIO_AUTH_TOKEN']
 
 
-def _set_url_database(url , databasename):
-    """creates url with provided DB for the engine """
+def send_mail(mail_type, phone, feedback=''):
+    """
+    Function is used for sending the mail when the user is created and the user gives feedback
+    the type of the mail is decided by mail_type of the argument.
+    """
+    phone = str(phone[0:5] + '*****' + phone[10:])
+    if mail_type == 'FEEDBACK':
+        with open('templates/feedback.html', 'r') as template:
+            html = ''.join(template.readlines())
+            message = Mail(
+                from_email=sender_mail,
+                to_emails=recipient_list,
+                subject=mail_type,
+                html_content=html.format(phone=phone, feedback=feedback))
 
-    url = make_url(url)
-    if hasattr(sa.engine, 'URL'):
-        res = sa.engine.URL.create(
-            drivername=url.drivername,
-            username=url.username,
-            password=url.password,
-            host=url.host,
-            port=url.port,
-            database=databasename,
-            query=url.query
-        )
-    else:  # SQLAlchemy <1.4
-        url.database = databasename
-        res = url
-
-    return res
-
-
-def create_db_if_not_exists(url:str,dbname:str):
-    """Check and Creates DB as per the Db name if it doesnot exists """
-
-    query  =  f"SELECT 1 FROM pg_database WHERE datname='{dbname}'"
-    en = sa.create_engine(url,isolation_level="AUTOCOMMIT", echo=False)
-    with en.connect() as con:
-        r = con.scalar(query)
-        if not r:
-            sql = f'CREATE DATABASE "{dbname}"'
-            con.execute(sql)
-
-
-def create_table(engine,main_sheet,wrksht):
-    """ Function thats actualy takes the Database and creates a entry inside the postgresSQL server"""
-
-    df = main_sheet.getDataframe(wrksht)
-    table_name = wrksht
-    current_utc = datetime.datetime.utcnow()
-    df["CreatedUTC"] = current_utc
-    df.to_sql(
-        table_name,
-        engine,
-        if_exists='replace',
-        index=False,
-        chunksize=500,
-    )
-    return True
-
-    
-def execute(max_worker = 5):
-    """ The main function that create the migration and performes it """
-    if max_worker > 15:
-        raise RuntimeError("cannot creat workers above 15")
-
-    # from .settings import Spreadsheet_config as sp_config
-    # from .settings import PostgresSQL_config as psql_config
-    from app.utils.gspread_to_postgres import Spreadsheet_config as sp_config
-    from app.utils.gspread_to_postgres import spreadsheet_config as psql_config
-
-    if psql_config.__dict__.get('database'):
-        database =  psql_config.database
+    elif mail_type == 'NEW USER':
+        with open('templates/welcome.html', 'r') as template:
+            html = ''.join(template.readlines())
+            message = Mail(
+                from_email=sender_mail,
+                to_emails=recipient_list,
+                subject=mail_type,
+                html_content=html.format(phone=phone))
     else:
-        database =  sp_config.spreadsheet_name
-    
-    DBDRIVER = psql_config.__dict__.get("DRIVER","postgresql")
-    
-    uri = f"{DBDRIVER}://{psql_config.username}:{psql_config.password}@{psql_config.host}:{psql_config.port}"
-    create_db_if_not_exists(uri,database)
+        print("Please check the mail_type before sending mail")
+        return
+    try:
+        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        response = sg.send(message)
+        if response.status_code == 202:
+            print('send successfully')
+    except Exception as e:
+        print(e)
 
-    url_with_db = _set_url_database(uri,database)
-    
-    engine = sa.create_engine(url_with_db, echo=False)
 
-    main_sheet = GoogleSheetHelper(sp_config.credential_path, sp_config.spreadsheet_name)
+# helper class
+class TimeZoneHelper:
+    def __init__(self, phoneNumber):
+        self.phoneNumber = phoneNumber
+        self.tzs_df = pd.read_csv("data/tzmapping.csv")
+        self.tzs_df.index = self.tzs_df['State']
+        self.user_zone = self.numberToTimeZone()
+        self.fmt = '%Y-%m-%d %H:%M:%S %Z%z'
 
-    if sp_config.backup_all_worksheets:
-        wrksheet_list = main_sheet.getAllWorksheet()
-    else:
-        wrksheet_list =  sp_config.worksheet_to_consider
+    def numberToTimeZone(self):
+        """This function converts a phone number to a timezone"""
+        fmtNum = phonenumbers.parse("+" + str(self.phoneNumber))
+        state = geocoder.description_for_number(fmtNum, 'en')
+        time_zone = self.tzs_df.loc[state]['Zone'].split(" ")[0]
+        return "US/" + time_zone
 
-    qu = Queue()  
-    threadlist = []
-    for _ in range(max_worker):
-        t = Worker(queue=qu,target=create_table,daemon=True)
-        t.start()
-        # threadlist.append(t)
+    def utcToLocal(self):
+        """This function gets current local time from utc time given a zone in 24-hour time format"""
+        # get utc time
+        utc_dt = datetime.datetime.utcnow()
+        # convert to localtime using tz object and string formatter
+        zone_objct = timezone(self.user_zone)
+        loc_dt = utc_dt.astimezone(zone_objct)
+        return loc_dt.strftime(self.fmt)
 
-    for wrksht in wrksheet_list:
-        # create_table(engine,main_sheet,wrksht)
-        qu.put((engine,main_sheet,wrksht))
-    qu.join()
 
-    
+# helper function to get temporary User data
+def getTemporaryUserData():
+    """This function gets temporary data from google sheet with proper formatting of User data"""
+    # define the scope
+    scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+    # add credentials to the account
+    creds = ServiceAccountCredentials.from_json_keyfile_name('data/master_key.json', scope)
+    # authorize the clientsheet 
+    client = gspread.authorize(creds)
+    # get the instance of the Spreadsheet
+    sheet = client.open_by_url(
+        "https://docs.google.com/spreadsheets/d/1M-IQ-iYji-dbJSkrPehh3CMLiLGlzWZBzzGqVWzJPog/edit?usp=sharing")
+    # get all worksheets
+    sheet_instance = sheet.worksheets()
+    # convert to dataframe
+    dataframe = pd.DataFrame(sheet_instance[0].get_all_records())
+    return dataframe
+
+
+# helper function to find appropriate match from temporary User data
+def matchFromDf(dataframe, tz_from, verbose=False):
+    """This function gets a match for user to call"""
+    df = dataframe
+    df[["DT Start"]] = df[["UTC start"]].apply(pd.to_datetime)
+    df[["DT End"]] = df[["UTC end"]].apply(pd.to_datetime)
+
+    # get current UTC time and find match
+    now_utc = datetime.datetime.utcnow()
+    tz = tz_from.numberToTimeZone()  # tz = "US/Pacific"
+    mask = (df['DT Start'] < now_utc) & (df['DT End'] >= now_utc) & (df['time zone'] == tz)
+    result = df.loc[mask]
+    match = result.head(1)
+    match = int(match['Number'])
+
+    # log to console if necessary (default=False)
+    if verbose:
+        print(f"dataframe shape {dataframe.shape}")  # all results shape
+        print(f"result shape: {result.shape}")  # candidate matches shape
+
+    return match
+
+
+def call_duration_from_api(phone):
+    """
+    The function is used for fetching the call duration for a particular number from the call log API of
+    twilio and sum up the duration for the day and return it.
+    """
+    if phone:
+        client = Client(account_sid, auth_token)
+        date = datetime.datetime.today()
+        calls = client.calls.list(from_=str(phone),
+                                  start_time_after=datetime.datetime(date.year, date.month, date.day, 0, 0, 0))
+        duration = 0
+        for record in calls:
+            duration += int(record.duration)
+        return duration
+    raise ValueError("No valid phone number found")
