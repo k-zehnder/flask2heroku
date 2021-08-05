@@ -14,11 +14,22 @@ from app.utils.tmp_core import call_to_check_bld
 def hello():
     return "Hello World!"
 
+@bp.route("/sms", methods=['GET', 'POST'])
+def sms_reply():
+    """Respond to incoming with a simple text message."""
+
+    resp = MessagingResponse()
+    #msg = resp.message()
+
+    return str(resp)
+
 @bp.route("/profile_detail")
 def profile_detail():
     """ Function for gathering profile information from the Client"""
     return "At profile detail"
-
+    
+    #TODO: query from db here in route
+    #TODO: set timeszone for user to return proper time from postgres
     # check data in spreadsheet
     # scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
     # creds = ServiceAccountCredentials.from_json_keyfile_name(cred_json, scope)
@@ -62,13 +73,6 @@ def profile_detail():
     #             print(f'for {ph}:{v} is good')
 
 
-@bp.route("/sms", methods=['GET', 'POST'])
-def sms_reply():
-    """Respond to incoming with a simple text message."""
 
-    resp = MessagingResponse()
-    #msg = resp.message()
-
-    return str(resp)
 
 
