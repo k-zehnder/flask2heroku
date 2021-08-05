@@ -1,6 +1,5 @@
 import os
-from gspread_to_postgres.coresettings import Checksettings
-
+from app.gspread_to_postgres.coresettings import Checksettings
 
 ####### Define Your settings Below ############
 
