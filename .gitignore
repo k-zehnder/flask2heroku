@@ -12,3 +12,7 @@ key/
 # Reference
 reference/
 envEQUALSmarvelize.txt
+
+celerybeat*
+heroku.png
+scheduler.png
