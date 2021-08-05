@@ -1,4 +1,6 @@
 from datetime import datetime
+from twilio.twiml.messaging_response import MessagingResponse
+from twilio import twiml
 from flask import render_template, flash, redirect, url_for, request, g, \
     jsonify, current_app
 from app import db
@@ -58,3 +60,15 @@ def profile_detail():
     #                 break
     #         else:
     #             print(f'for {ph}:{v} is good')
+
+
+@bp.route("/sms", methods=['GET', 'POST'])
+def sms_reply():
+    """Respond to incoming with a simple text message."""
+
+    resp = MessagingResponse()
+    #msg = resp.message()
+
+    return str(resp)
+
+
