@@ -15,21 +15,36 @@ from app.models import Patient
 from app.main import bp
 from playhouse.db_url import connect # needed for peewee in heroku
 from app.utils.utility_fxns import GoogleSheetHelper
+from app.models import Patient
 
 # from flaskapp.core.ivr_core import *
 # from flaskapp.models.ivr_model import *
 
+########################################################################################
+# create data each time app starts up (remove db.drop_tables[Patient]) if want to keep data
 load_dotenv()
+db = connect(os.environ.get('DATABASE_URL'))
+db.connect()
+db.drop_tables([Patient])
+db.create_tables([Patient])
 
 cred_json = "/home/batman/Desktop/flask2heroku/data/key.json"
 gsh = GoogleSheetHelper(cred_json, "users_test")
-# print(gsh.getAllSpreadsheets())
-# print(gsh.getDataframe("users_test"))
-df = gsh.getDataframe("users_test")
 
-db = connect(os.environ.get('DATABASE_URL'))
-#db.drop_tables([Patient])
-db.create_tables([Patient])
+df = gsh.getDataframe("users_test")
+df_dict = df.to_dict('records')
+
+for d in df_dict:
+    p = Patient(
+            username=d["Username"], 
+            utc_start=d["UTC start"],
+            utc_end=d["UTC end"],
+            phone=d["Number"],
+            timezone=d["time zone"]
+            )
+    p.save() # each row now stored in database
+db.close()
+########################################################################################
 
 @bp.route('/', methods=['GET', 'POST'])
 def hello():

@@ -10,9 +10,9 @@ from twilio.rest import Client
 
 recipient_list = ['goandtodo@googlegroups.com']
 
-sender_mail = 'heartvoices.org@gmail.com'
-account_sid = os.environ['TWILIO_ACCOUNT_SID']
-auth_token = os.environ['TWILIO_AUTH_TOKEN']
+# sender_mail = 'heartvoices.org@gmail.com'
+# account_sid = os.environ['TWILIO_ACCOUNT_SID']
+# auth_token = os.environ['TWILIO_AUTH_TOKEN']
 
 
 def send_mail(mail_type, phone, feedback=''):
