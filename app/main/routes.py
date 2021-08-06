@@ -1,37 +1,35 @@
 import os
+from datetime import datetime
 from peewee import *
-from flask import request, jsonify, url_for
-from flask import Response
 from twilio.twiml.voice_response import VoiceResponse, Dial, Gather, Say, Client
-from twilio.rest import Client as Client
+from twilio.twiml.messaging_response import MessagingResponse
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from datetime import datetime
 from twilio.twiml.messaging_response import MessagingResponse
 from twilio import twiml
 from flask import render_template, flash, redirect, url_for, request, g, \
     jsonify, current_app
-from playhouse.db_url import connect # needed for peewee in heroku
 from dotenv import load_dotenv
 from app import db
 from app.models import Patient
 from app.main import bp
+from playhouse.db_url import connect # needed for peewee in heroku
+from app.utils.utility_fxns import GoogleSheetHelper
 
-from twilio.twiml.voice_response import VoiceResponse, Dial, Gather, Say, Client
-from twilio.rest import Client as Client
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
 # from flaskapp.core.ivr_core import *
 # from flaskapp.models.ivr_model import *
 
 load_dotenv()
 
-from playhouse.db_url import connect
-
+cred_json = "/home/batman/Desktop/flask2heroku/data/key.json"
+gsh = GoogleSheetHelper(cred_json, "users_test")
+# print(gsh.getAllSpreadsheets())
+# print(gsh.getDataframe("users_test"))
+df = gsh.getDataframe("users_test")
 
 db = connect(os.environ.get('DATABASE_URL'))
+#db.drop_tables([Patient])
 db.create_tables([Patient])
-# Patient.create(username="Kiran")
 
 @bp.route('/', methods=['GET', 'POST'])
 def hello():
@@ -53,6 +51,7 @@ def sms_reply():
     #msg = resp.message()
 
     return str(resp)
+
 
 @bp.route("/profile_detail/<new_user>")
 def profile_detail(new_user):

@@ -38,12 +38,15 @@ class GoogleSheetHelper:
 
 from app.models import Patient
 
-db = PostgresqlDatabase('patient', user='zelda', password="password", host='127.0.0.1', port=5432) 
+db = PostgresqlDatabase('fetchdb', user='zelda', password="password", host='127.0.0.1', port=5432) 
 db.connect()
 db.drop_tables([Patient])
 db.create_tables([Patient])
 
-df = pd.read_csv("/home/batman/Desktop/flask2heroku/users_test.csv")
+cred_json = "/home/batman/Desktop/flask2heroku/data/key.json"
+gsh = GoogleSheetHelper(cred_json, "users_test")
+
+df = gsh.getDataframe("users_test")
 df_dict = df.to_dict('records')
 
 for d in df_dict:
@@ -57,3 +60,17 @@ for d in df_dict:
     p.save() # each row now stored in database
 
 db.close()
+
+
+
+# table_name = "patient"
+# current_utc = datetime.datetime.utcnow()
+# df["CreatedUTC"] = current_utc
+# df.to_sql(
+#     table_name,
+#     db,
+#     if_exists='replace',
+#     index=False,
+#     chunksize=500,
+# )
+
