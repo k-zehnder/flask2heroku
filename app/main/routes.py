@@ -28,7 +28,9 @@ db.connect()
 db.drop_tables([Patient])
 db.create_tables([Patient])
 
-cred_json = "/home/batman/Desktop/flask2heroku/data/key.json"
+# cred_json = "/home/batman/Desktop/flask2heroku/data/key.json"
+cred_json = "data/key.json"
+
 gsh = GoogleSheetHelper(cred_json, "users_test")
 
 df = gsh.getDataframe("users_test")
