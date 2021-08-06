@@ -43,7 +43,7 @@ db.connect()
 # db.drop_tables([Patient])
 db.create_tables([Patient])
 
-df = pd.read_csv("/home/batman/Desktop/flask2heroku/users_test.csv")
+df = pd.read_csv("/home/batman/Desktop/flask2heroku/data/users_test.csv")
 df_dict = df.to_dict('records')
 
 for d in df_dict:

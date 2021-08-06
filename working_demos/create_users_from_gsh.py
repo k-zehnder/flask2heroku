@@ -60,17 +60,3 @@ for d in df_dict:
     p.save() # each row now stored in database
 
 db.close()
-
-
-
-# table_name = "patient"
-# current_utc = datetime.datetime.utcnow()
-# df["CreatedUTC"] = current_utc
-# df.to_sql(
-#     table_name,
-#     db,
-#     if_exists='replace',
-#     index=False,
-#     chunksize=500,
-# )
-
