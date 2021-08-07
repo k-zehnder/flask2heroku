@@ -3,8 +3,15 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 import os, config
+from os import environ
+from peewee import *
+from playhouse.db_url import connect # needed for peewee in heroku
 
-db = SQLAlchemy()
+#db = SQLAlchemy()
+url = os.environ.get("DATABASE_URL") 
+if url.startswith("postgres://"):
+    url = url.replace("postgres://", "postgresql://", 1)
+db = connect(url)
 
 # application factory
 def create_app():
@@ -13,7 +20,7 @@ def create_app():
     app.config.from_object(Config)
 
     # Initialize plugins
-    db.init_app(app)
+    #db.init_app(app)
 
     with app.app_context():
 
