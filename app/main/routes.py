@@ -22,9 +22,9 @@ from app.models import Patient
 
 ########################################################################################
 # create data each time app starts up (remove db.drop_tables[Patient]) if want to keep data
-# load_dotenv()
-# db = connect(os.environ.get('DATABASE_URL'))
-# db.connect()
+load_dotenv()
+db = connect(os.environ.get('DATABASE_URL'))
+db.connect()
 # # db.drop_tables([Patient]) # dont use for heroku
 # # db.create_tables([Patient]) # dont use for heroku
 
