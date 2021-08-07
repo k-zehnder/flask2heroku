@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 from app import db
 from app.models import Patient
 from app.main import bp
-from playhouse.db_url import connect # needed for peewee in heroku
+from playhouse.db_url import connect  # needed for peewee in heroku
 from app.utils.utility_fxns import GoogleSheetHelper
 from app.models import Patient
 
@@ -38,15 +38,16 @@ df_dict = df.to_dict('records')
 
 for d in df_dict:
     p = Patient(
-            username=d["Username"], 
-            utc_start=d["UTC start"],
-            utc_end=d["UTC end"],
-            phone=d["Number"],
-            timezone=d["time zone"]
-            )
-    p.save() # each row now stored in database
+        username=d["Username"],
+        utc_start=d["UTC start"],
+        utc_end=d["UTC end"],
+        phone=d["Number"],
+        timezone=d["time zone"]
+    )
+    p.save()  # each row now stored in database
 db.close()
 ########################################################################################
+
 
 @bp.route('/', methods=['GET', 'POST'])
 def hello():
@@ -59,6 +60,7 @@ def hello():
 
     users = [user for user in Patient.select()]
     return render_template('index.html', users=users, title="IVR App Demo")
+
 
 @bp.route("/sms", methods=['GET', 'POST'])
 def sms_reply():
@@ -73,11 +75,11 @@ def sms_reply():
 @bp.route("/profile_detail/<new_user>")
 def profile_detail(new_user):
     """ Function for gathering profile information from the Client"""
-    #return f"At profile detail for {new_user}"
+    # return f"At profile detail for {new_user}"
     return render_template('_new_user.html', new_user=new_user)
-    
-    #TODO: query from db here in route
-    #TODO: set timeszone for user to return proper time from postgres
+
+    # TODO: query from db here in route
+    # TODO: set timeszone for user to return proper time from postgres
     # check data in spreadsheet
     # scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
     # creds = ServiceAccountCredentials.from_json_keyfile_name(cred_json, scope)
@@ -155,7 +157,6 @@ def profile_detail(new_user):
 #         gather.say('Welcome to Heart Voices ! We are really helping to people in their journey to a healthy life. Do you want to join us? Say yes or no.')
 #         resp.append(gather)
 #     return str(resp)
-
 
 
 # def after_call():
@@ -257,7 +258,7 @@ def profile_detail(new_user):
 #     resp = VoiceResponse()
 #     to_number = request.form['To']
 #     from_number = request.form['From']  #tel = request.values['From']
-    
+
 #     # timezone helper class to get time zone from number
 #     tz_from = TimeZoneHelper(from_number)
 
@@ -432,7 +433,6 @@ def profile_detail(new_user):
 #     return (jsonify(x))
 
 
-
 # def voice_joined():
 #     """ Function for making joined call """
 #     resp = VoiceResponse()
@@ -467,7 +467,6 @@ def profile_detail(new_user):
 #         gather.say('Welcome to Heart Voices ! We are really helping to people in their journey to a healthy life. Do you want to join us? Say yes or no.')
 #         resp.append(gather)
 #     return str(resp)
-
 
 
 # def after_call():
@@ -569,7 +568,7 @@ def profile_detail(new_user):
 #     resp = VoiceResponse()
 #     to_number = request.form['To']
 #     from_number = request.form['From']  #tel = request.values['From']
-    
+
 #     # timezone helper class to get time zone from number
 #     tz_from = TimeZoneHelper(from_number)
 
