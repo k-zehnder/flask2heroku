@@ -22,30 +22,30 @@ from app.models import Patient
 
 ########################################################################################
 # create data each time app starts up (remove db.drop_tables[Patient]) if want to keep data
-load_dotenv()
-db = connect(os.environ.get('DATABASE_URL'))
-db.connect()
-# db.drop_tables([Patient]) # dont use for heroku
-# db.create_tables([Patient]) # dont use for heroku
+# load_dotenv()
+# db = connect(os.environ.get('DATABASE_URL'))
+# db.connect()
+# # db.drop_tables([Patient]) # dont use for heroku
+# # db.create_tables([Patient]) # dont use for heroku
 
-# cred_json = "/home/batman/Desktop/flask2heroku/data/key.json"
-cred_json = "data/key.json"
+# # cred_json = "/home/batman/Desktop/flask2heroku/data/key.json"
+# cred_json = "data/key.json"
 
-gsh = GoogleSheetHelper(cred_json, "users_test")
+# gsh = GoogleSheetHelper(cred_json, "users_test")
 
-df = gsh.getDataframe("users_test")
-df_dict = df.to_dict('records')
+# df = gsh.getDataframe("users_test")
+# df_dict = df.to_dict('records')
 
-for d in df_dict:
-    p = Patient(
-        username=d["Username"],
-        utc_start=d["UTC start"],
-        utc_end=d["UTC end"],
-        phone=d["Number"],
-        timezone=d["time zone"]
-    )
-    p.save()  # each row now stored in database
-db.close()
+# for d in df_dict:
+#     p = Patient(
+#         username=d["Username"],
+#         utc_start=d["UTC start"],
+#         utc_end=d["UTC end"],
+#         phone=d["Number"],
+#         timezone=d["time zone"]
+#     )
+#     p.save()  # each row now stored in database
+# db.close()
 ########################################################################################
 
 
